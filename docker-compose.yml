@@ -1,0 +1,17 @@
+version: '3.4'
+
+networks:
+  scanner-net:
+    external: true
+
+services:
+  scanner:
+    image: iamquoz/scanner:latest
+    networks:
+      - scanner-net
+    ports:
+      - 5000:80
+    environment:
+      - qr_verbosity=info
+      - qr_port=80
+      - qr_host=0.0.0.0

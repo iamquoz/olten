@@ -1,0 +1,30 @@
+# Ignore Python bytecode files
+**/__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore Node.js modules
+**/node_modules
+
+# Ignore build output
+**/build
+**/dist
+*.log
+*.tgz
+*.zip
+
+# Ignore environment files
+**/.dockerignore
+**/.env
+**/.git
+**/.gitignore
+
+# Ignore editor files
+.vscode/
+.idea/
+*.iml
+
+# Ignore miscellaneous files
+.DS_Store
+Thumbs.db
