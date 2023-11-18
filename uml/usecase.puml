@@ -1,0 +1,13 @@
+@startuml usecase
+actor User
+
+User --> (Select camera)
+User --> (Grant Camera Permission)
+User --> (Click on Detected Code)
+User --> (View Decoded Data)
+
+(Select camera) --> (Start Video Stream) : includes
+(Click on Detected Code) <.. (Open New Tab/Copy to Clipboard) : extends
+(View Decoded Data)
+
+@enduml

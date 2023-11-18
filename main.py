@@ -9,8 +9,8 @@ import av
 from aiohttp import web
 from aiortc.contrib.media import MediaRelay
 from aiortc import MediaStreamTrack, RTCDataChannel, RTCPeerConnection, RTCSessionDescription
-import cv2
 import jsonpickle
+import numpy
 
 from utils import read_barcodes
 
@@ -25,13 +25,11 @@ class VideoTransformTrack(MediaStreamTrack):
 
 	async def recv(self) -> av.VideoFrame:
 		frame = await self.track.recv()
-		img = frame.to_ndarray(format="bgr24")
+		img: numpy.ndarray = frame.to_ndarray(format="bgr24")
 
 		if self.channel is not None:
-			# await self.channel._RTCDataChannel__transport._data_channel_flush()
-			# await self.channel._RTCDataChannel__transport._transmit()
 			result_data = read_barcodes(img)
-			self.channel.send(str(jsonpickle.encode(sorted(result_data, key=lambda x: x.data), False)))
+			self.channel.send(str(jsonpickle.encode(result_data, False)))
 
 		return frame
 
@@ -43,6 +41,7 @@ relay = MediaRelay()
 video_track: VideoTransformTrack | None = None
 
 async def offer(request: web.Request) -> web.Response:
+	"""Establish a new WebRTC connection"""
 	params = await request.json()
 	offer = RTCSessionDescription(sdp=params["sdp"], type=params["type"])
 
@@ -50,20 +49,23 @@ async def offer(request: web.Request) -> web.Response:
 	pc_id = "PeerConnection(%s)" % uuid.uuid4()
 	pcs.add(pc)
 
-	def log_info(msg, *args):
+	def log_info(msg: str, *args):
+		"""Write a specific event for a ``pc_id`` to logs"""
 		logger.info(pc_id + " " + msg, *args)
 
 	log_info("Created for %s", request.remote)
 
 	@pc.on("datachannel")
 	def on_datachannel(channel: RTCDataChannel):
+		"""Init a datachannel and assign it to current user"""
+
 		global video_track
 		if video_track is not None:
 			video_track.channel = channel
 
-
 	@pc.on("iceconnectionstatechange")
 	async def on_connectionstatechange():
+		"""Drop user if we can't connect"""
 		log_info("Connection state is %s", pc.connectionState)
 		if pc.connectionState == "failed":
 			await pc.close()
@@ -71,6 +73,7 @@ async def offer(request: web.Request) -> web.Response:
 
 	@pc.on("track")
 	def on_track(track: MediaStreamTrack):
+		"""Add a new track to the connection"""
 		global video_track
 		video_track = VideoTransformTrack(relay.subscribe(track))
 		log_info("Track %s received", track.kind)
@@ -94,12 +97,12 @@ async def offer(request: web.Request) -> web.Response:
 		})
 	)
 
-
 async def index(request: web.Request) -> web.Response:
     content = open(os.path.join(ROOT, "dist/index.html"), "r").read()
     return web.Response(content_type="text/html", text=content)
 
 async def on_shutdown(app: web.Application):
+	"""Close all connections on shutdown"""
 	print("Shutting down...")
 	coros = [pc.close() for pc in pcs]
 	await asyncio.gather(*coros)

@@ -4,5 +4,6 @@
 	},
 	"python.formatting.provider": "none",
 	"python.analysis.typeCheckingMode": "basic",
-	"python.analysis.autoImportCompletions": true
+	"python.analysis.autoImportCompletions": true,
+	"python.testing.unittestEnabled": true,
 }

@@ -196,8 +196,8 @@ export default function App() {
 							<canvas ref={canvasRef} onClick={canvasOnClick} style={{ display: !ispcEstablished ? 'none' : 'block', width: '100%' }} />
 						</Box>
 						<Group>
-							<Button onClick={start} size='lg'>Начать работу</Button>
-							<Select label='Камера' allowDeselect={false} placeholder='Выберите камеру'
+							<Button onClick={start} size='lg' id='start_button'>Начать работу</Button>
+							<Select label='Камера' disabled={ispcEstablished} allowDeselect={false} placeholder='Выберите камеру'
 								data={devices.map(x => ({
 								label: x.label,
 								value: x.deviceId
@@ -212,25 +212,25 @@ export default function App() {
 					</Stack>
 					<Stack align='stretch' justify='center'>
 						<Title order={2}>Полученные штрих- и QR-коды</Title>
-						<Grid>
+						<Grid id = 'results'>
 							{barcodes.length < 1 && <Grid.Col><Text ta={'center'} fs={'italic'}>Нет данных</Text></Grid.Col>}
 							{barcodes.map((barcode, index) => {
 								const isUrl = isValidHttpUrl(barcode.data);
 								return <Grid.Col span={{base: 12, md: 6, lg: 3}}>
-									<Card key={index} withBorder m={10}>
-									<Group justify='space-between'>
-										<Text fw={500}>{isUrl ? 'Ссылка' : 'Данные'}</Text>
-										{barcode.type == 'QRCODE' && <Badge>QR-код</Badge>}
-										{isBarcode(barcode.type) && <Badge color='red'>Штрихкод</Badge>}
-									</Group>
-									<Text size="sm" c="dimmed">
-										{barcode.data}
-									</Text>
-									<Button leftSection={isUrl ? <IconExternalLink /> : <IconClipboard />}
-										variant="light" color="blue" fullWidth mt="md" radius="md"
-										onClick={() => handleBarcodeInteraction(barcode, isUrl)}>
-										{isUrl ? 'Перейти' : 'Скопировать'}
-									</Button>
+									<Card key={index} withBorder m={10} className='result'>
+										<Group justify='space-between'>
+											<Text fw={500}>{isUrl ? 'Ссылка' : 'Данные'}</Text>
+											{barcode.type == 'QRCODE' && <Badge>QR-код</Badge>}
+											{isBarcode(barcode.type) && <Badge color='red'>Штрихкод</Badge>}
+										</Group>
+										<Text size="sm" c="dimmed">
+											{barcode.data}
+										</Text>
+										<Button leftSection={isUrl ? <IconExternalLink /> : <IconClipboard />}
+											variant="light" color="blue" fullWidth mt="md" radius="md"
+											onClick={() => handleBarcodeInteraction(barcode, isUrl)}>
+											{isUrl ? 'Перейти' : 'Скопировать'}
+										</Button>
 									</Card>
 								</Grid.Col>
 							})}

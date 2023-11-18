@@ -1,0 +1,15 @@
+@startuml sequence
+actor User
+participant Frontend
+participant Backend
+
+User -> Frontend: Select camera
+Frontend -> User: Request Camera Permission
+User -> Frontend: Grant Camera Permission
+Frontend -> Backend: Start Video Stream
+Backend -> Frontend: Return Frame and Decoded Data
+Frontend -> User: Display Frame and Detected Codes
+User -> Frontend: Click on Detected Code
+Frontend -> User: Open New Tab/Copy to Clipboard
+Frontend -> User: Display Decoded Data in Table
+@enduml

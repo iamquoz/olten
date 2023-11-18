@@ -1,0 +1,25 @@
+@startuml deployment
+
+package "Docker" {
+  [Scanner Image] ..> [Python:3.11-slim] : extends
+  [Scanner Image] ..> [Node] : extends
+  [Scanner Image] ..> [Frontend Build] : contains
+  [Scanner Image] ..> [Backend Server] : contains
+}
+
+node "Host Machine" {
+  [Docker Engine] ..> [Scanner Image] : runs
+}
+
+cloud "Github Action" {
+  [Workflow] ..> [Scanner Image] : builds
+}
+
+cloud "Docker Hub" {
+  [Workflow] ..> [Docker Hub] : pushes to
+}
+
+actor User as user
+user ..> [Frontend Build] : interacts with
+
+@enduml

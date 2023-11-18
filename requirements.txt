@@ -2,5 +2,7 @@ aiohttp==3.8.6
 aiortc==1.5.0
 av==10.0.0
 jsonpickle==3.0.2
+numpy==1.26.2
 opencv_python_headless==4.8.1.78
 pyzbar==0.1.9
+selenium==4.15.2
